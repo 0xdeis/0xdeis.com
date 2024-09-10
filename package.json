@@ -10,10 +10,15 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/check": "^0.5.10",
-    "@astrojs/starlight": "^0.21.5",
-    "astro": "^4.3.5",
+    "@astrojs/check": "0.9.3",
+    "@astrojs/starlight": "0.27.1",
+    "astro": "4.15.4",
+    "rehype-katex": "^7.0.0",
+    "remark-math": "^6.0.0",
     "sharp": "^0.33.3",
     "typescript": "^5.4.5"
+  },
+  "devDependencies": {
+    "prettier-plugin-astro": "^0.14.1"
   }
 }

@@ -1,0 +1,134 @@
+---
+type Props = {
+  id: string;
+  question: string;
+  options: string[];
+  answerIndicies: number[];
+};
+
+const { question, options, answerIndicies, id } = Astro.props;
+---
+
+<div class="quiz-card" id={id} data-quiz data-quiz-answered="false">
+  <div class="question">{question}</div>
+  {
+    options.map((option, index) => (
+      <button
+        class="sl-link-card"
+        data-quiz-button
+        data-correct={answerIndicies.includes(index) ? "true" : "false"}
+      >
+        <span class="sl-flex stack">
+          <span class="title">{option}</span>
+        </span>
+      </button>
+    ))
+  }
+</div>
+
+<script>
+  const quizzes = document.querySelectorAll(
+    "[data-quiz]",
+  ) as NodeListOf<HTMLDivElement>;
+  quizzes.forEach((quiz) => {
+    const buttons = quiz.querySelectorAll(
+      "[data-quiz-button]",
+    ) as NodeListOf<HTMLButtonElement>;
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        if (quiz.dataset.quizAnswered === "false") {
+          quiz.dataset.quizAnswered = "true";
+          console.log("posthog", posthog);
+          posthog.capture("quiz_answered", {
+            id: quiz.id,
+            question: quiz.querySelector(".question")?.textContent,
+            answer: button.querySelector(".title")?.textContent,
+            correct: button.dataset.correct,
+          });
+        } else {
+          return;
+        }
+        buttons.forEach((button) => {
+          button.classList.remove("selected");
+        });
+        button.classList.add("selected");
+      });
+    });
+  });
+  // // Find all buttons with the `alert` class on the page.
+  // const buttons = document.querySelectorAll(``) as NodeListOf<HTMLButtonElement>;
+
+  // // Handle clicks on each button.
+  // buttons.forEach((button) => {
+  //   button.addEventListener("click", () => {
+  //     buttons.forEach((button) => {
+  //       button.classList.remove("selected");
+  //     });
+  //     // const correct = button.dataset.correct === "true";
+  //     button.classList.add("selected");
+  //     // alert(`"${button.textContent?.trim()}" ${correct}`);
+  //   });
+  // });
+</script>
+
+<style>
+  .quiz-card {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: var(--sl-shadow-sm);
+    position: relative;
+  }
+
+  .sl-link-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: var(--sl-shadow-sm);
+    position: relative;
+    /* background: var(--sl-color-gray-7); */
+    background: unset;
+    width: 100%;
+  }
+
+  button.selected[data-correct="true"] {
+    background: var(--sl-color-gray-3);
+  }
+  button.selected[data-correct="false"] {
+    background: var(--sl-color-gray-5);
+  }
+
+  .stack {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .title {
+    color: var(--sl-color-white);
+    font-weight: 600;
+    font-size: var(--sl-text-lg);
+    font-family: "Courier New", Courier, monospace;
+  }
+
+  .description {
+    color: var(--sl-color-gray-3);
+    line-height: 1.5;
+  }
+
+  .icon {
+    color: var(--sl-color-gray-3);
+  }
+
+  /* Hover state */
+  .sl-link-card:hover {
+    background: var(--sl-color-gray-7, var(--sl-color-gray-6));
+    border-color: var(--sl-color-gray-2);
+  }
+
+  .sl-link-card:hover .icon {
+    color: var(--sl-color-white);
+  }
+</style>
