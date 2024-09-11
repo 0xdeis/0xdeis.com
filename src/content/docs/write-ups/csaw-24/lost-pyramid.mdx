@@ -56,7 +56,7 @@ def entrance():
         "CURRENT_DATE": f"{current_date}_AD",
         "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=(365*3000))
     }
-t   token = jwt.encode(payload, PRIVATE_KEY, algorithm="EdDSA")
+    token = jwt.encode(payload, PRIVATE_KEY, algorithm="EdDSA")
     
     response = make_response(render_template('pyramid.html'))
     response.set_cookie('pyramid', token)
