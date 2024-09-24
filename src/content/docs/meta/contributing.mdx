@@ -1,0 +1,81 @@
+---
+title: Contributing
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+If all you want to do is make a quick edit to a page, there is an "edit page" button at the bottom of every page that brings you to github.
+Make your edits, and open a PR.
+
+## Development
+
+This website/documentation page was built with [Starlight](https://starlight.astro.build/). You write markdown or mdx (markdown extended) and it turns into html.
+
+<Steps>
+
+1. Clone the repo
+
+    ```bash
+    git clone git@github.com:0xdeis/0xdeis.com.git
+    ```
+
+2. Install `bun`, a javascript package manager.
+
+    From https://bun.sh/
+
+    ```bash
+    # Linux / MacOS
+    curl -fsSL https://bun.sh/install | bash
+
+    # Windows
+    powershell -c "irm bun.sh/install.ps1 | iex"
+    ```
+
+3. Install dependencies
+
+    ```bash
+    bun install
+    ```
+
+4. Make a new branch
+
+    ```bash
+    git switch -c feat/...
+    # or
+    git switch -c fix/...
+    ```
+
+5. Start the dev server
+
+    ```bash
+    bun dev
+    ```
+
+    ```
+    $ astro dev
+    19:01:15 [types] Generated 1ms
+
+     astro  v4.15.9 ready in 477 ms
+
+    ┃ Local    http://localhost:4321/
+    ┃ Network  use --host to expose
+
+    19:01:15 watching for file changes...
+    ```
+
+6. Navigate to http://localhost:4321
+
+7. Configure your editor.
+
+    For neovim
+
+    - https://morizbuesing.com/blog/mdx-support-in-nvchad/
+    - https://www.reddit.com/r/neovim/comments/1ewwtok/has_anyone_figured_out_intellisense_in_mdx_files/
+
+    For VSCode
+
+    - https://marketplace.visualstudio.com/items?itemName=unifiedjs.vscode-mdx
+
+8. Make some changes, commit, and push to start the review cycle.
+
+</Steps>

@@ -28,10 +28,11 @@ export default defineConfig({
         },
         {
           label: "Guides",
-          items: [
-            // Each item here is one entry in the navigation menu.
-            { label: "Example Guide", link: "/guides/example/" },
-          ],
+          autogenerate: { directory: "guides" },
+          // items: [
+          //   // Each item here is one entry in the navigation menu.
+          //   { label: "Example Guide", link: "/guides/example/" },
+          // ],
         },
         {
           label: "Reference",
@@ -41,6 +42,10 @@ export default defineConfig({
           label: "writeups",
           autogenerate: { directory: "write-ups", collapsed: true },
           badge: { text: "New", variant: "tip" },
+        },
+        {
+          label: "Meta",
+          autogenerate: { directory: "meta" },
         },
       ],
       editLink: {

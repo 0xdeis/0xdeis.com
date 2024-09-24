@@ -1,0 +1,107 @@
+---
+title: "Web Server Basics"
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Custom backend web servers are a very common piece of software, because most web applications need one. 
+So, you can create a web server is basically any language.
+Most languages have some library/framework that makes writing web servers easy.
+
+<Tabs>
+<TabItem label="Go">
+
+```go
+package main
+
+import (
+	"fmt"
+	"net/http"
+)
+
+func main() {
+	router := http.NewServeMux()
+
+	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello world"))
+	})
+
+	fmt.Println("Listening on http://localhost:8080")
+	http.ListenAndServe(":8080", router)
+}
+```
+
+</TabItem>
+<TabItem label="Python">
+
+```py
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+async def root():
+    return "Hello world"
+```
+
+</TabItem>
+<TabItem label="JS/TS">
+
+```ts
+import Fastify from 'fastify'
+
+fastify.get('/', function (request, reply) {
+  reply.send({ hello: 'world' })
+})
+
+fastify.listen({ port: 3000 }, function (err, address) {
+  if (err) {
+    fastify.log.error(err)
+    process.exit(1)
+  }
+})
+```
+
+</TabItem>
+<TabItem label="Rust">
+
+```rust
+use axum::{response::Html, routing::get, Router};
+
+#[tokio::main]
+async fn main() {
+    let app = Router::new().route("/", get(handler));
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+        .await
+        .unwrap();
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn handler() -> Html<&'static str> {
+    Html("<h1>Hello, World!</h1>")
+}
+```
+
+</TabItem>
+</Tabs>
+
+As there are many options to go with, selecting the correct one for the job can be difficult.
+
+Selecting your most familiar language is what most beginners go with, but it may not be the best option for your problem.
+
+Most beginners start with high level languages like JavaScript and Python, which have bad error handling and large garbage collection spikes.
+If uptime, stability, and maintainability are important to your backend, you should consider other options.
+
+However, if iteration speed and code sharing are more important, then you would make a different choice.
+
+Premature optimization is bad, but sometimes by moving forward without any optimizations, you can't go back and add it later.
+JavaScript can only run so fast. You can't make it run faster than go, it's not physically possible.
+
+If I wanted a service that I could write and forget about, and know it would still be running in 5 years, I would pick rust.
+
+If I want a good balance between iteration speed, code maintainability, and good error handling, I would choose go.
+Go is a very straight forward language, almost forcing you to be productive. Compared to the other examples above, there is no magic `@` operator like python. There is no ambiguity on how a JavaScript object gets converted into text. And, there is no verbose syntax list Rust, because Go is garbage collected.
+
+All these points make Go an excellent choice for writing web severs.

@@ -1,0 +1,60 @@
+---
+title: Linux & Bash
+---
+
+import { Aside } from "@astrojs/starlight/components";
+import Quiz from "../../../components/Quiz.astro";
+
+<Aside>
+  If you already know content from a section, make sure you can still pass the
+  quizzes at the bottom, then feel free to move on.
+</Aside>
+
+- cli is important
+  - uniform interface -> compatable with each other / easy to combine into automations
+  - lower barrier for creation -> more available tools
+  - faster than GIUs
+  - sometimes they are your only option
+- amazing post https://gabevenberg.com/posts/cli-renaissance/
+
+{/*When hacking pretty much anything (online), there are some tools that you
+end up using a lot. It's definitely worth learning these tools in and out,
+because
+
+- knowing the capabilities of these tools gives you ideas when hacking
+- learning how they work gives you specific knowledge about the underlying
+  technology
+
+The terminal (or shell or command line) is the most powerful way to use most
+tools. Most GUIs (graphical user interfaces) have to be dumbed down because
+showing the user 200 buttons, text inputs, and sliders would be way too much
+information to process and get familiar with.
+
+That's where the command line interface (CLI) comes in.
+
+All CLI tools can do the exact same thing a GUI can, they just use a single line
+of text instead of many buttons and text boxes. Most of the time, the text-only
+approach ends up letting you do what you want faster and with less mental
+overhead.*/}
+
+Luckily, there is a fun and interactive way to learn the most common tools.
+Plus, once you learn a few, the rest are super easy to pick up.
+
+Head over to
+[https://overthewire.org/wargames/bandit/](https://overthewire.org/wargames/bandit/)
+and don't come back until you're done. If you get stuck, try one more out of the
+box idea, and then head to the hints page (TODO).
+
+<Quiz
+  id="navigate-to-parent-directory"
+  question="How do you navigate to the parent directory?"
+  options={["cd ..", "cd /", "cd ~", "cd -"]}
+  answerIndicies={[0]}
+/>
+
+<Quiz
+  id="list-files-in-directory"
+  question="What is the command to list files in a directory?"
+  options={["ls", "dir", "list", "show"]}
+  answerIndicies={[0]}
+/>

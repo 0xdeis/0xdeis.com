@@ -7,8 +7,8 @@ hero:
   image:
     file: ../../assets/houston.webp
   actions:
-    - text: Example Guide
-      link: /guides/example/
+    - text: Get started with the fundamentals
+      link: /fundamentals/0_bash/
       icon: right-arrow
       variant: primary
     - text: Read the Starlight docs
@@ -16,32 +16,34 @@ hero:
       icon: external
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
-import {} from "../../components/posthog.astro"
+import { Card, CardGrid } from "@astrojs/starlight/components";
+import {} from "../../components/posthog.astro";
 
 > Programmers and hackers use the same knowledge, they just think differently.
 >
-> -- Live Overflow, [The Secret step-by-step Guide to learn Hacking](https://www.youtube.com/watch?v=2TofunAI6fUA)
+> -- Live Overflow,
+> [The Secret step-by-step Guide to learn Hacking](https://www.youtube.com/watch?v=2TofunAI6fUA)
 
 Learning how to program $\iff$ learning how to hack.
 
 Before getting into hacking things, you first have to understand how they work.
-If you want to hack websites, you first need to understand how they work, then you can begin to find bugs.
-Maybe even make a few websites to really see how everything fits together, and then try to break things.
+If you want to hack websites, you first need to understand how they work, then
+you can begin to find bugs. Maybe even make a few websites to really see how
+everything fits together, and then try to break things.
 
 ## Next steps
 
 <CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
+  <Card title="Update content" icon="pencil">
+    Edit `src/content/docs/index.mdx` to see this page change.
+  </Card>
+  <Card title="Add new content" icon="add-document">
+    Add Markdown or MDX files to `src/content/docs` to create new pages.
+  </Card>
+  <Card title="Configure your site" icon="setting">
+    Edit your `sidebar` and other config in `astro.config.mjs`.
+  </Card>
+  <Card title="Read the docs" icon="open-book">
+    Learn more in [the Starlight Docs](https://starlight.astro.build/).
+  </Card>
 </CardGrid>

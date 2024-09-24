@@ -11,14 +11,18 @@
   },
   "dependencies": {
     "@astrojs/check": "0.9.3",
-    "@astrojs/starlight": "0.27.1",
-    "astro": "4.15.4",
+    "@astrojs/starlight": "0.28.2",
+    "astro": "4.15.9",
     "rehype-katex": "^7.0.0",
     "remark-math": "^6.0.0",
     "sharp": "^0.33.3",
     "typescript": "^5.4.5"
   },
   "devDependencies": {
+    "prettier": "^3.3.3",
     "prettier-plugin-astro": "^0.14.1"
+  },
+  "prettier": {
+    "proseWrap": "always"
   }
 }
