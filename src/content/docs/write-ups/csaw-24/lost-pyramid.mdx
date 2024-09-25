@@ -169,8 +169,8 @@ if __name__ == '__main__':
 ## Solution
 
 The /scarab_room route is vulnrable to SSTI via the `name` parameter. However,
-it does it processed before the SSTI. Only alphanumeric characters and "{" and
-"}" are allowed.
+it does it processed before the SSTI. Only alphanumeric characters and "\{" and
+"\}" are allowed.
 
 ```py
 @app.route('/scarab_room', methods=['GET', 'POST'])
