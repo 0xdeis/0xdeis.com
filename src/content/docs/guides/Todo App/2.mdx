@@ -4,7 +4,8 @@ title: "Intro to Golang"
 
 import { FileTree } from "@astrojs/starlight/components";
 
-Select a place where to store your project. If you don't have one in mind, `~/code/` could be a good start.
+Select a place where to store your project. If you don't have one in mind,
+`~/code/` could be a good start.
 
 ```bash
 cd ~/code/
@@ -13,8 +14,11 @@ mkdir todo-app
 
 ## Creating a go module
 
-You need to select a unique identifier for your project, called a module path, so that people can locate and import code from it.
-If you have a domain, a commen convention is to use a URL that you have control over. I personally use `github.com/AlexanderHOtt/<project name>`, but if you have a domain you want to use, it could be `<project name>.example.com`.
+You need to select a unique identifier for your project, called a module path,
+so that people can locate and import code from it. If you have a domain, a
+commen convention is to use a URL that you have control over. I personally use
+`github.com/AlexanderHOtt/<project name>`, but if you have a domain you want to
+use, it could be `<project name>.example.com`.
 
 ```bash
 go mod init github.com/<github username>/todo-app
@@ -22,10 +26,7 @@ go mod init github.com/<github username>/todo-app
 
 You should have a new file named "go.mod" with similar contents below
 
-<FileTree>
-- go.mod
-</FileTree>
-
+<FileTree>- go.mod</FileTree>
 
 ```txt title="go.mod"
 module github.com/0xdeis/todo-app
@@ -50,7 +51,6 @@ func main() {
 1. All go files must be a part of a package. The default package is "main".
 2. Go import statements have the package name in double quotes.
 3. The `main` function is the default entry point of the go program.
-
 
 ```bash
 go run .
