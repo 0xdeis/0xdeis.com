@@ -19,7 +19,7 @@ export default defineConfig({
       },
       social: {
         github: "https://github.com/0xdeis",
-        discord: "https://discord.gg/sT7J97rDQ4",
+        discord: "https://discord.gg/32c7VFWCP6",
       },
       sidebar: [
         {
