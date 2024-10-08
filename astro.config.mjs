@@ -47,6 +47,10 @@ export default defineConfig({
           label: "Meta",
           autogenerate: { directory: "meta" },
         },
+        {
+          label: "External",
+          autogenerate: { directory: "external" },
+        },
       ],
       editLink: {
         baseUrl: "https://github.com/0xdeis/0xdeis.com/edit/main/",
