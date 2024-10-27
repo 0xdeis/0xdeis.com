@@ -12,7 +12,7 @@ export default defineConfig({
   },
   integrations: [
     starlight({
-      title: "BCSC",
+      title: "HACK",
       customCss: ["./src/styles/custom.css", "./src/styles/katex.min.css"],
       components: {
         Head: "./src/components/Head.astro",
