@@ -1,0 +1,291 @@
+---
+title: "Web servers in Golang"
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+There are a few ways to write backends (web servers) in golang. 
+There's the [`net/http`](https://pkg.go.dev/net/http) package in the standard library, but theres also 3rd party libraries:
+ - [chi](https://github.com/go-chi/chi): lightweight, idiomatic and composable router for building Go HTTP services
+ - [gorilla](https://gorilla.github.io/): A helpful toolkit for the Go programming language that provides useful, composable packages for writing HTTP-based applications.
+ - [echo](https://github.com/labstack/echo): High performance, minimalist Go web framework
+ - [huma](https://github.com/danielgtaylor/huma): Huma REST/HTTP API Framework for Golang with OpenAPI 3.1
+
+They all have different features and tradeoffs, but we wil be using the built-in `net/http` because it is one less thing to learn,
+even if it means we have to write more boilerplatey code.
+
+## The basics
+
+Here is a basic example
+
+```go title="main.go"
+package main
+
+import (
+    "log"
+    "net/http"
+)
+
+func main() {
+    log.Fatal(http.ListenAndServe(":8080", nil))
+}
+```
+
+> [`log.Fatal`](https://pkg.go.dev/log#Fatal) is equivalent to `log.Print` followed by a call to os.Exit(1).
+
+> [`http.ListenAndServe(":8080", nil)`](https://pkg.go.dev/net/http#ListenAndServe) listens on the TCP network address 8080 and then calls Serve with handler to handle requests on incoming connections. Accepted connections are configured to enable TCP keep-alives.
+> 
+> The handler is typically nil, in which case DefaultServeMux is used.
+> 
+> ListenAndServe always returns a non-nil error.
+
+If you run `go run main.go`, you should see nothing. Let's add some functionality.
+
+## Routers and handlers
+
+In basically every framework, we write a function that gets associated with a path and one or more HTTP methods. 
+See this table as an example.
+
+| Function    | Path               | 
+| ----------- | ------------------ |
+| `say_hello` | `GET /hello`       |
+| `version`   | `GET /version`     |
+| `login`     | `POST /auth/login` |
+
+This mapping is done by something normally call a router (in Go, they are called `ServeMux`).
+It *routes* the request to the correct function. 
+These functions are sometimes called handlers, because they *handle* HTTP requests.
+
+Let's add a `ServeMux` and a handler to our go program, and lets also print something out just so we know its working.
+
+```go title="main.go"
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+)
+
+func say_hello(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "hello world")
+}
+
+func main() {
+	router := http.NewServeMux()
+	router.HandleFunc("GET /hello", hello_world)
+
+	log.Println("Running on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
+```
+
+You need to stop (ctrl+c) and restart the server whenevery you make changes to your code. We will address this soon.
+
+If you go to http://localhost:8080/hello in your browser, you should see "hello world".
+
+There's no reason we have to make it a separate function though. 
+Go supports annonymous functions, which leads to locality of behavior, something that is useful when developing larger projects.
+
+```go title="main.go"
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+)
+
+func main() {
+	router := http.NewServeMux()
+	router.HandleFunc("GET /hello", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "hello world")
+	})
+
+	log.Println("Running on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
+```
+
+This pattern, however, makes it so that testing the individual handlers is impossible. 
+I argue that testing handlers individually isn't useful, and you should try to end-to-end test wherever you can.
+We will cover testing much later.
+
+## Path parameters and error handling
+
+Go provides a way for you to include data as part of the path, e.g. `/customer/1234`.
+We can specify a route has a path parameter with the `{name}` syntax, e.g. `/customer/{id}`.
+
+```go title="main.go"
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"strconv"
+)
+
+func main() {
+	router := http.NewServeMux()
+	router.HandleFunc("GET /hello", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "hello world")
+	})
+	router.HandleFunc("GET /customer/{id}", func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.PathValue("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			// parsing the integer failed
+			http.Error(w, "Invalid customer id: "+idStr, http.StatusUnprocessableEntity)
+			return
+		}
+		if id != 1234 {
+			// we only have 1 customer :(
+			http.NotFound(w, r)
+			return
+		}
+		fmt.Fprintln(w, "hello customer "+strconv.Itoa(id))
+	})
+
+	log.Println("Running on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
+```
+
+If you go to http://localhost:8080/customer/1234, you should see "hello customer 1234"
+ - http://localhost:8080/customer/asdf should respond with "Invalid customer id: asdf"
+ - http://localhost:8080/customer/1235 should respond with "404 page not found"
+
+## State
+
+> Our API need to “remember” things: the current todos, the current user, the who is logged in. This API specific memory is called state.
+> 
+> reworded from https://react.dev/learn/state-a-components-memory
+
+We can introduce some state in the form of a global varialbe.
+
+```go title="main.go"
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"strconv"
+)
+
+var count int = 0
+
+func main() {
+	router := http.NewServeMux()
+
+	router.HandleFunc("GET /count", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, strconv.Itoa(count))
+	})
+	router.HandleFunc("POST /count/increment", func(w http.ResponseWriter, r *http.Request) {
+		count += 1
+		fmt.Fprintln(w, strconv.Itoa(count))
+	})
+	router.HandleFunc("POST /count/reset", func(w http.ResponseWriter, r *http.Request) {
+		count = 0
+		fmt.Fprintln(w, strconv.Itoa(count))
+	})
+
+	log.Println("Running on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
+```
+
+If you go to http://localhost:8080/count, you should see 0.
+However, if you go to http://localhost:8080/count/increment, you should see "Method not allowed".
+
+This because we specificed the POST method for the `/count/increment` and `/count/reset`
+
+```bash
+curl -X POST http://localhost:8080/count/increment
+# AND
+curl -X POST http://localhost:8080/count/reset
+```
+
+Notice how when we want to *get* the current count, we use the GET HTTP method, but when we want to *change* it, we use the POST method.
+The method conveys intent from the client to the server, and also allows for stuff like caching.
+
+If instead of returning the count, we had to do some calculation, we could save ourselves from doing the calculation again (caching it) if the count didn't change. However, we can't cache an 'increment'. We always have to add one when we get a request to `POST /count/increment`
+
+```go title="main.go"
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"strconv"
+	"time"
+)
+
+var count int = 0
+var isCached bool = false
+
+func main() {
+	router := http.NewServeMux()
+
+	router.HandleFunc("GET /count", func(w http.ResponseWriter, r *http.Request) {
+		if !isCached {
+			time.Sleep(2 * time.Second)
+			isCached = true
+		}
+		fmt.Fprintln(w, strconv.Itoa(count))
+	})
+	router.HandleFunc("POST /count/increment", func(w http.ResponseWriter, r *http.Request) {
+		isCached = false
+		count += 1
+		fmt.Fprintln(w, strconv.Itoa(count))
+	})
+	router.HandleFunc("POST /count/reset", func(w http.ResponseWriter, r *http.Request) {
+		isCached = false
+		count = 0
+		fmt.Fprintln(w, strconv.Itoa(count))
+	})
+
+	log.Println("Running on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
+```
+
+<Aside type="caution">
+
+Using global variables for state isn't safe. 
+
+This is not a tutorial on concurrency or thread safety, so if this next part goes over your head don't worry.
+
+We can use a tool like [oha](https://github.com/hatoo/oha) to spam our api with 1,000,000 requests.
+
+```bash
+oha -n 1000000 -m POST http://localhost:8080/count/increment
+```
+
+After, when going to http://localhost:8080/count, we don't see 1000000, we see a smaller number (mine was 979437)
+
+This is because Go runs all the handler funcs concurrently, and the `count += 1` is really 
+
+```go
+temp := count
+count = temp + 1
+```
+
+so we could have two Go routines (Go's mechanism for concurrency) run like
+
+```go
+// count = 5
+tempA := count
+tempB := count
+count = tempA + 1
+count = tempB + 1
+```
+
+We will continue to use global state for a bit, but it will not be our final solution.
+
+If you need to use global variables for state, use either a [Mutex](https://pkg.go.dev/sync#Mutex), [RWMutex](https://pkg.go.dev/sync#RWMutex) for more granular locking, or [Atomics](https://pkg.go.dev/sync/atomic).
+
+
+</Aside>
