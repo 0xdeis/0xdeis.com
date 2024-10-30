@@ -5,13 +5,13 @@ title: "Web servers in Golang"
 import { Aside } from '@astrojs/starlight/components';
 
 There are a few ways to write backends (web servers) in golang. 
-There's the [`net/http`](https://pkg.go.dev/net/http) package in the standard library, but theres also 3rd party libraries:
+There's the [`net/http`](https://pkg.go.dev/net/http) package in the standard library, but there's also 3rd party libraries:
  - [chi](https://github.com/go-chi/chi): lightweight, idiomatic and composable router for building Go HTTP services
  - [gorilla](https://gorilla.github.io/): A helpful toolkit for the Go programming language that provides useful, composable packages for writing HTTP-based applications.
  - [echo](https://github.com/labstack/echo): High performance, minimalist Go web framework
  - [huma](https://github.com/danielgtaylor/huma): Huma REST/HTTP API Framework for Golang with OpenAPI 3.1
 
-They all have different features and tradeoffs, but we wil be using the built-in `net/http` because it is one less thing to learn,
+They all have different features and tradeoffs, but we will be using the built-in `net/http` because it is one less thing to learn,
 even if it means we have to write more boilerplatey code.
 
 ## The basics
@@ -33,7 +33,7 @@ func main() {
 
 > [`log.Fatal`](https://pkg.go.dev/log#Fatal) is equivalent to `log.Print` followed by a call to os.Exit(1).
 
-> [`http.ListenAndServe(":8080", nil)`](https://pkg.go.dev/net/http#ListenAndServe) listens on the TCP network address 8080 and then calls Serve with handler to handle requests on incoming connections. Accepted connections are configured to enable TCP keep-alives.
+> [`http.ListenAndServe(":8080", nil)`](https://pkg.go.dev/net/http#ListenAndServe) listens on the TCP network address 8080 and then calls Serve with handler to handle requests on incoming connections. Accepted connections are configured to enable TCP `keep-alive`s.
 > 
 > The handler is typically nil, in which case DefaultServeMux is used.
 > 
@@ -80,12 +80,12 @@ func main() {
 }
 ```
 
-You need to stop (ctrl+c) and restart the server whenevery you make changes to your code. We will address this soon.
+You need to stop (ctrl+c) and restart the server whenever you make changes to your code. We will address this soon.
 
 If you go to http://localhost:8080/hello in your browser, you should see "hello world".
 
 There's no reason we have to make it a separate function though. 
-Go supports annonymous functions, which leads to locality of behavior, something that is useful when developing larger projects.
+Go supports anonymous functions, which leads to locality of behavior, something that is useful when developing larger projects.
 
 ```go title="main.go"
 package main
@@ -162,7 +162,7 @@ If you go to http://localhost:8080/customer/1234, you should see "hello customer
 > 
 > reworded from https://react.dev/learn/state-a-components-memory
 
-We can introduce some state in the form of a global varialbe.
+We can introduce some state in the form of a global variable.
 
 ```go title="main.go"
 package main
@@ -199,7 +199,7 @@ func main() {
 If you go to http://localhost:8080/count, you should see 0.
 However, if you go to http://localhost:8080/count/increment, you should see "Method not allowed".
 
-This because we specificed the POST method for the `/count/increment` and `/count/reset`
+This because we specified the POST method for the `/count/increment` and `/count/reset`
 
 ```bash
 curl -X POST http://localhost:8080/count/increment
