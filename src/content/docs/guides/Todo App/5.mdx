@@ -1,0 +1,138 @@
+---
+title: "DX and Project Structure"
+---
+
+import { FileTree } from "@astrojs/starlight/components";
+
+## Fast Refresh
+
+It's pretty annoying to `ctrl+c` `up arrow` every time you make a change.
+If only there was some way to watch for file changes and then do something...
+
+That's where [`air`](https://github.com/air-verse/air) comes in to save the day.
+
+Air is "live reload for Go apps". That means whenever a file is changed, it re-runs a command we specify.
+
+To install, run `go install github.com/air-verse/air@latest`
+
+And use this command to start it
+
+```bash
+air --build.cmd "go build -o main main.go" --build.bin "./main"
+```
+
+The `--build.cmd` tells air how to build your go program, and the `--build.bin` tells air what to run.
+
+Change the port the server is running on.
+You should see air stop and restart your server. 
+Make sure it works by checking the server is running on the new port you used.
+
+---
+
+It would be annoying to type that out every time we want to start development, and it would only get worse. 
+We could put that in a bash script, but air supports using a configuration file.
+Run `air init` to generate the default one named `.air.toml` (you need to pass `-a` to `ls` to see files that start with ".").
+It should look like
+
+```toml
+root = "."
+testdata_dir = "testdata"
+tmp_dir = "tmp"
+
+[build]
+  args_bin = []
+  bin = "./tmp/main"
+  cmd = "go build -o ./tmp/main ."
+  delay = 1000
+  exclude_dir = ["assets", "tmp", "vendor", "testdata"]
+  exclude_file = []
+  exclude_regex = ["_test.go"]
+  exclude_unchanged = false
+  follow_symlink = false
+  full_bin = ""
+  include_dir = []
+  include_ext = ["go", "tpl", "tmpl", "html"]
+  include_file = []
+  kill_delay = "0s"
+  log = "build-errors.log"
+  poll = false
+  poll_interval = 0
+  post_cmd = []
+  pre_cmd = []
+  rerun = false
+  rerun_delay = 500
+  send_interrupt = false
+  stop_on_error = false
+
+[color]
+  app = ""
+  build = "yellow"
+  main = "magenta"
+  runner = "green"
+  watcher = "cyan"
+
+[log]
+  main_only = false
+  time = false
+
+[misc]
+  clean_on_exit = false
+
+[proxy]
+  app_port = 0
+  enabled = false
+  proxy_port = 0
+
+[screen]
+  clear_on_rebuild = false
+  keep_scroll = true
+```
+
+It's quite a lot, but we won't have to make any changes for now. 
+With the configuration file setup, we can just run `air` and it will work.
+
+## Project Structure
+
+As with anything, a little bit of organization can go a long way.
+The Go language gives a recommendation for the project structure of a web server.
+
+https://go.dev/doc/modules/layout#server-project
+
+<FileTree>
+- project-root-directory/
+  - go.mod
+  - internal/
+    - auth/
+      - ...
+    - metrics/
+      - ...
+    - model/
+      - ...
+  - cmd/
+    - api-server/
+      - main.go
+    - metrics-analyzer/
+      - main.go
+</FileTree>
+
+We will take a lot of inspiration from this. 
+However, let's start with something much simpiler.
+
+<FileTree>
+- project-root-directory/
+  - .air.toml
+  - go.mod
+  - cmd/
+    - web/
+      - main.go
+</FileTree>
+
+We also need to update our `.air.toml` to reflect the new project structure.
+
+```toml
+[build]
+  # ...
+  cmd = "go build -o ./tmp/main ./cmd/web/"
+```
+
+Let's run `air` one more time to make sure everything works.
