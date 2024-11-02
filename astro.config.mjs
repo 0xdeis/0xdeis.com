@@ -33,6 +33,7 @@ export default defineConfig({
           //   // Each item here is one entry in the navigation menu.
           //   { label: "Example Guide", link: "/guides/example/" },
           // ],
+          badge: { text: "New", variant: "tip" },
         },
         {
           label: "Reference",
@@ -41,7 +42,6 @@ export default defineConfig({
         {
           label: "writeups",
           autogenerate: { directory: "write-ups", collapsed: true },
-          badge: { text: "New", variant: "tip" },
         },
         {
           label: "Meta",

@@ -1,0 +1,307 @@
+---
+title: "Todo REST API"
+---
+
+## APIs
+
+What is an API?
+
+> APIs are mechanisms that enable two software components to communicate with each other using a set of definitions and protocols. For example, the weather bureau’s software system contains daily weather data. The weather app on your phone “talks” to this system via APIs and shows you daily weather updates on your phone.
+>
+> -- [AWS](https://aws.amazon.com/what-is/api/)
+
+APIs are language agnostic (most of the time), which allows the users of the API to be flexible in their technology decisions.
+APIs are more broad than just backend and frontend development, so when I refer to API in the future, I'm probably speaking about a backend API service.
+
+
+
+## REST
+
+What is a REST API?'
+
+> A REST API is an API that follows the design principles of the REST architectural style.
+>
+> REST is short for representational state transfer, and is a set of rules and guidelines about how you should build a web API.
+> When a client request is made via a RESTful API, it transfers a representation of the state of the resource to the requester or endpoint.
+> [Red Hat](https://www.redhat.com/en/topics/api/what-is-a-rest-api)
+
+There are alternatives to REST, like GraphQL, but they are hard to secure (see [Why, after 6 years, I’m over GraphQL](https://bessey.dev/blog/2024/05/24/why-im-over-graphql/)), and don't offer much more than what an OpenAPI schema does.
+
+## REST API in Go
+
+Let's remove some of the experiments we did previously and get started with the TODO app.
+
+```go title="cmd/web/main.go"
+package main
+
+import (
+	"log"
+	"net/http"
+)
+
+func main() {
+	router := http.NewServeMux()
+
+	log.Println("Running on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
+```
+
+We'll start by adding some global state (that will eventually be substituted for something else).
+
+```go title="cmd/web/main.go"
+package main
+
+import (
+	"log"
+	"net/http"
+)
+
+type Todo struct {
+	Task string
+	Done bool
+}
+
+var todos []Todo = []Todo{
+	{Task: "Remove global state", Done: false},
+	{Task: "Go to HACK club meeting", Done: false},
+	{Task: "Start learning Go", Done: true},
+}
+
+func main() {
+	router := http.NewServeMux()
+
+	log.Println("Running on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
+```
+
+Now, let's add a route to retrieve this state.
+
+```go title="cmd/web/main.go"
+package main
+
+import (
+	"encoding/json"
+	"log"
+	"net/http"
+)
+
+type Todo struct {
+	Task string `json:"task"`
+	Done bool   `json:"done"`
+}
+
+var todos []Todo = []Todo{
+	{Task: "Remove global state", Done: false},
+	{Task: "Go to HACK club meeting", Done: false},
+	{Task: "Start learning Go", Done: true},
+}
+
+func main() {
+	router := http.NewServeMux()
+
+	router.HandleFunc("GET /api/todo", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(todos)
+	})
+
+	log.Println("Running on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
+```
+
+Notice the `` `json:"..."` `` struct tags, it tells the `JsonEncoder` what to put as the field name.
+We also need to manually set the content type, so that our browser and other clients know what we are sending them.
+
+```bash
+curl http://localhost:8080/api/todo
+```
+
+Now, let's add a way to add a todo.
+
+
+```go title="cmd/web/main.go"
+package main
+
+import (
+	"encoding/json"
+	"log"
+	"net/http"
+)
+
+type Todo struct {
+	Task string `json:"task"`
+	Done bool   `json:"done"`
+}
+
+var todos []Todo = []Todo{
+	{Task: "Remove global state", Done: false},
+	{Task: "Go to HACK club meeting", Done: false},
+	{Task: "Start learning Go", Done: true},
+}
+
+func main() {
+	router := http.NewServeMux()
+
+	router.HandleFunc("GET /api/todo", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(todos)
+	})
+
+	router.HandleFunc("POST /api/todo", func(w http.ResponseWriter, r *http.Request) {
+		var newTodo struct {
+			Task string `json:"task"`
+		}
+		err := json.NewDecoder(r.Body).Decode(&newTodo)
+		if err != nil || newTodo.Task == "" {
+			http.Error(w, "Invalid input", http.StatusBadRequest)
+			return
+		}
+		todos = append(todos, Todo{Task: newTodo.Task, Done: false})
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(todos)
+	})
+
+	log.Println("Running on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
+```
+
+To receive input, we create a temporary struct and decode the body of the request into it.
+If there was an error decoding or the task was empty, we respond with the status [400: bad requests](https://www.rfc-editor.org/rfc/rfc9110.html#section-15.5.1)
+
+```bash
+curl -X POST -d '{"task": "hi"}' http://localhost:8080/api/todo
+```
+
+To add a delete option, we need a way to indentify the todo, and the task string isn't enough.
+We can add an `ID` field to the struct and just increment
+
+
+```go title="cmd/web/main.go"
+package main
+
+import (
+	"encoding/json"
+	"log"
+	"net/http"
+	"slices"
+	"strconv"
+)
+
+type Todo struct {
+	ID   uint   `json:"id"`
+	Task string `json:"task"`
+	Done bool   `json:"done"`
+}
+
+var todos []Todo = []Todo{
+	{Task: "Remove global state", Done: false, ID: 1},
+	{Task: "Go to HACK club meeting", Done: false, ID: 2},
+	{Task: "Start learning Go", Done: true, ID: 3},
+}
+var nextId uint = 4
+
+func main() {
+	router := http.NewServeMux()
+
+	router.HandleFunc("GET /api/todo", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(todos)
+	})
+
+	router.HandleFunc("POST /api/todo", func(w http.ResponseWriter, r *http.Request) {
+		var newTodo struct {
+			Task string `json:"task"`
+		}
+		err := json.NewDecoder(r.Body).Decode(&newTodo)
+		if err != nil || newTodo.Task == "" {
+			http.Error(w, "Invalid input", http.StatusBadRequest)
+			return
+		}
+		todos = append(todos, Todo{Task: newTodo.Task, Done: false, ID: nextId})
+		nextId++
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(todos)
+	})
+
+	router.HandleFunc("DELETE /api/todo/{id}", func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.PathValue("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			http.Error(w, "id is not a number", http.StatusBadRequest)
+			return
+		}
+		idx := slices.IndexFunc(todos, func(todo Todo) bool { return todo.ID == uint(id) })
+		if idx < 0 {
+			http.NotFound(w, r)
+			return
+		}
+		removedTodo := todos[idx]
+		todos = append(todos[:idx], todos[idx+1:]...)
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(removedTodo)
+	})
+
+	log.Println("Running on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
+```
+
+```bash
+curl -X DELETE http://localhost:8080/api/todo/3
+```
+
+Let's also add a way to update a todo.
+
+```go title="cmd/web/main.go"
+func main() {
+	// ...
+	router.HandleFunc("PATCH /api/todo/{id}", func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.PathValue("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			http.Error(w, "id is not a number", http.StatusBadRequest)
+			return
+		}
+		idx := slices.IndexFunc(todos, func(todo Todo) bool { return todo.ID == uint(id) })
+		if idx < 0 {
+			http.NotFound(w, r)
+			return
+		}
+		var updatedTodo struct {
+			Task string `json:"task"`
+			Done *bool  `json:"done"` // bool will default to false, *bool will default to nil
+		}
+		err = json.NewDecoder(r.Body).Decode(&updatedTodo)
+		if err != nil {
+			http.Error(w, "bad json body", http.StatusBadRequest)
+			return
+		}
+		if updatedTodo.Task != "" {
+			todos[idx].Task = updatedTodo.Task
+		}
+		if updatedTodo.Done != nil {
+			todos[idx].Done = *updatedTodo.Done
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(todos[idx])
+	})
+	// ...
+}
+```
+
+We, again, create a temporary struct to decode the request's body into, and then update the todo in the slice.
+
+```bash
+curl -X PATCH -d '{"task": "swap out global state with a database", "id": 1}' http://localhost:8080/api/todo/3
+
+curl http://localhost:8080/api/todo
+```
+
+Why use an API?
