@@ -46,7 +46,7 @@ async def root():
 ```
 
 </TabItem>
-<TabItem label="JS/TS">
+<TabItem label="JS/TS - Fastify">
 
 ```ts
 import Fastify from "fastify";
@@ -61,6 +61,21 @@ fastify.listen({ port: 3000 }, function (err, address) {
     process.exit(1);
   }
 });
+```
+
+</TabItem>
+<TabItem label="JS/TS - Hono">
+
+```ts
+import { Hono } from "hono";
+
+const app = new Hono();
+
+app.get("/", (c) => {
+  return c.json({ hello: "world" });
+});
+
+export default app;
 ```
 
 </TabItem>
