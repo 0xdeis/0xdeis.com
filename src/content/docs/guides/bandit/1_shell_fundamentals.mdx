@@ -1,0 +1,25 @@
+---
+title: Shell Fundamentals
+---
+
+The purpose of this section is to give you a understanding of what a shell is, and assist you in completing the first 10 levels of bandit. It will provide less and less assistance as you reach higher and higher levels. It will probably be difficult if it is your first time working with a linux shell, but that's actually good, because that difficulty will help you learn this very important and fundamental skill. Do not be discouraged, as you can do this! 
+
+These docs will help ease the learning curve slightly. Some of the documentation for the shell can be very overwhelming and badly written, which can be frustrating, especially to a new shell user, and impede their learning. This will aim to serve as very basic documentation, meant to teach you the basics of a command to get you started on your journey, but if you ever need to delve deeper, these docs won't be as helpful.
+
+# What is a shell?
+A shell, also know as a command line interface (aka a CLI), is an interface with your operating system (that's the interface part). You use this interface by issuing "commands" to your OS (that's the command line part). That's all it is at its core. But what is a command? A command is usually a binary executable (think a .exe file from windows), that does something on your computer. It can take in different parameters (called arguments) which will modify the output that the command gives. 
+
+This might not make much sense on its own, so let's use a basic command as an example: ls. ls stands for list and all it does is list the contents of a directory (this is the same thing as a folder on windows) and print it to the terminal. 
+
+If you type in 
+```bash
+ls
+```
+This will print the contents of the current directory you are in.
+
+However, you can also pass an argument to the command like so:
+```bash
+ls test
+```
+The "test" word is an argument being passed to the command. Arguments are usually separated by spaces. Now instead of listing the files in the current directory, the ls command will list the contents of the subdirectory in your current directory called test (provided it exists). If you for example wanted to see the contents of a directory called crab, you can replace the word "test" with "crab" and ls would list the contents of that directory instead.
+
