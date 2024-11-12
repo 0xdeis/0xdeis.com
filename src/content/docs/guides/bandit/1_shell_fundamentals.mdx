@@ -9,7 +9,7 @@ These docs will help ease the learning curve slightly. Some of the documentation
 # What is a shell?
 A shell, also know as a command line interface (aka a CLI), is an interface with your operating system (that's the interface part). You use this interface by issuing "commands" to your OS (that's the command line part). That's all it is at its core. But what is a command? A command is usually a binary executable (think a .exe file from windows), that does something on your computer. It can take in different parameters (called arguments) which will modify the output that the command gives. 
 
-This might not make much sense on its own, so let's use a basic command as an example: ls. ls stands for list and all it does is list the contents of a directory (this is the same thing as a folder on windows) and print it to the terminal. 
+This might not make much sense on its own, so let's use a basic command as an example: ls. ls stands for list and all it does is list the contents of a directory (this is the same thing as a folder on windows) and print it to the terminal (this is just the window where the CLI is runnning). 
 
 If you type in 
 ```bash
@@ -23,3 +23,10 @@ ls test
 ```
 The "test" word is an argument being passed to the command. Arguments are usually separated by spaces. Now instead of listing the files in the current directory, the ls command will list the contents of the subdirectory in your current directory called test (provided it exists). If you for example wanted to see the contents of a directory called crab, you can replace the word "test" with "crab" and ls would list the contents of that directory instead.
 
+If you're on mac, you can try using ls in your terminal (just search up terminal) and it will work like in linux (if you want to find out why, search up Unix and Unix based systems)
+
+If you're on windows, go to the microsoft store and install wsl (windows subsystem for linux) and also install ubuntu (this is a linux distribution, don't worry too much about what that means just yet). Then open up wsl (just like any other app).
+
+Now that you're in your terminal, run the command ```cd /``` (this changes your directory to the root directory, but once again, don't worry about what that means just yet). Then try running ```ls``` on its own, and then trying running ```ls``` on some of the results you get. Keep doing this and just play around a bit until you get stuck.
+
+After you get stuck watch this video: [Become a shell wizard in about 12 mins](https://www.youtube.com/watch?v=IYZDIhfAUM0). It's really short and you don't need to understand everything. Try to follow along with the video as much as you can, and remember you can always come back to it if you forget something. Only after you've done all that, should you move onto level 0 of bandit. But first pat yourself on the back, you learned a new, difficult skill!
