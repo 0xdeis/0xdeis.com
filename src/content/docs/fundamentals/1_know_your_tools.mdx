@@ -2,11 +2,13 @@
 title: Know Your Tools
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 ## Text Editor
 
 - autocomplete
 - code formatting
-- next/prev diagnositc
+- next/prev diagnositc 
 - go to definition / find references
 - rename
 - file search
@@ -18,7 +20,6 @@ title: Know Your Tools
 - signature help
 
 ### Neovim
-
 If you are new to neovim, you should install it at https://neovim.io/
 
 The very first thing you should do is to run the command `:Tutor` in Neovim. This will walk you through the basics.
@@ -29,23 +30,130 @@ If you don't know what this means, type the following:
   - Tutor
   - \<enter key>
 
+Alternatively, if you want to try learning some of the basics of vim through a game, check out [vim adventures](https://vim-adventures.com/)
 
 If want a good starting place for your configuration, I would suggest with https://github.com/nvim-lua/kickstart.nvim
 
-Eventually, I would recommend reading through the whole thing, but the tldr is:
+Start by navigating to your nvim config (usually in ~/.config/nvim) and open up your init.lua
 
+Eventually, I would recommend reading through the whole thing, but I'll explain some key features very quickly:
+
+#### Searching a File
+|Keybind|Action|
+|-------|------|
+|<kbd>/</kbd>|Search for an exact string|
+|<kbd>space+/</kbd>|Fuzzily search for a string|
+
+You can search for any word or phrase in a file very quickly by hitting <kbd>/</kbd> in normal mode. This will search for the exact sequence of characters you type in. 
+  - This is super similar to <kbd>Ctrl+F</kbd>
+  - Once you have typed in your word after <kbd>/</kbd>, hit enter to lock in your search. Then you can press <kbd>n</kbd> to go to the next instance of a word and <kbd>N</kbd> (capital N) to go to the previous instance of a word
+
+Kickstart also has a few settings enabled for search:
+```lua title="init.lua"
+-- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+
+-- Set highlight on search, but clear on pressing <Esc> in normal mode
+vim.opt.hlsearch = true
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+```
+These will be on by default, but you can turn them off if you don't like them.
+
+<Aside type="tip"> Try searching for these lines of code within your own init.lua to practice using <kbd>/</kbd> ! </Aside>
+
+Sometimes this is helpful, but sometimes you forgot exactly how you spelled something, luckily kickstart has you covered. If you press <kbd>space /</kbd>, you can do a fuzzy search on your current file. Basically, it won't just search for the exact string you typed in, but also similar strings. Try it out for yourself to see how it works!
+
+Here is what this looks like in your init.lua:
+```lua title="init.lua"
+-- Slightly advanced example of overriding default behavior and theme
+vim.keymap.set('n', '<leader>/', function()
+  -- You can pass additional configuration to Telescope to change the theme, layout, etc.
+  builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+    winblend = 10,
+    previewer = false,
+  })
+end, { desc = '[/] Fuzzily search in current buffer' })
+```
+Notice how it says <kbd>leader /</kbd> and not <kbd>space /</kbd>. The reason for this is because we also mapped our leader key to space earlier in the file. You can change this leader key to any key you want, but I recommend keeping it on space for now so as to not mess up any other keybindings.
+
+This is where the leader is set in your init.lua:
+```lua title="init.lua"
+-- Set <space> as the leader key
+-- See `:help mapleader`
+--  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
+``` 
+
+Now you have learned how to search in neovim! 🥳
+<Aside title="Recap"> / to search, n to go to the next found instance, N to go to the previous one. Space+/ to do the same thing but do a fuzzy search instead. Space is our default leader</Aside>
+
+#### Autocomplete
+
+#### Diagnostics
+
+#### File Search and Quick File Switching
+Whenever you're working on a project, you're often working with many different files, and you often want to quickly switch between them. Kickstart comes with a plugin called Telescope that helps with this. 
+
+One of the most useful features of Telescope is the ability to fuzzily find files in your current buffer. Essentially what that means, if you open neovim in a directory, you can use telescope to quickly switch to any file within the directory or any subdirectory. By default, the keybind to do this is <kbd>leader sf</kbd> (recall that by default, the leader is space). This will open up a window on top of you neovim, where you can type in the name of the file you want to switch to, hit enter, and then open that file. This allows you tio switch to any file in your project really quickly, no matter how many files it has (as long as you name your files well). You can also do this from the topmost directory of your project by just typing ```nvim``` and opening an empty buffer, and then hitting <kbd>leader sf</kbd> in there to find a file.
+
+This is the code that actually sets your Telescope keybinds
+
+```lua title="init.lua"
+local builtin = require 'telescope.builtin'
+vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
+vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
+-- This is where the file finder keybind is set
+vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+--
+vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
+vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
+vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
+vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
+vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
+vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+```
+
+What if you just wanted to look at another file but now you want to go back to your last one, or you keep working with two different files and need to constantly switch between them. By hitting <kbd>Ctrl 6</kbd> you can switch to the last file you had open. This will only switch to the last file you've opened. So if you were to press <kbd>Ctrl 6</kbd> once you'd be at the previous file you opened, but if you press it again, you will switch back to your original file (after the switch, your original file became the last file you had oepened).
+
+<kbd>Ctrl 6</kbd> is a default vim keybind so there's no kickstart code to show here.
+
+As a practice exercise, I would open any project that you have and try searching for a file using <kbd>leader sf</kbd>, then opening another file this way and trying to use <kbd>Ctrl 6</kbd> to switch between the two files you just opened.
+
+#### Hover to Look at docs for methods
+Most modern ide's allow
+
+#### Macros
+
+#### TODO
 (explain how to do the following)
 - autocomplete (Ctrl+Y to accept, Ctrl+N for next, Ctrl+P for pref)
-- code formatting (space f)
+- code formatting (space f) (also need lsp for this)
 - next/prev diagnositc (\[d and \]d)
+  - trouble.nvim
 - go to definition / find references (gd,gr)
+- keybinds vs keycords
 - rename (space r n)
-- file search (space s f, space s a)
-- local file text search (/)
+- file search (space s f, space s a) ***DONE!***
+- local file text search (/) ***DONE!***
 - full project text search (space s g)
 - open/close terminal (use something like tmux zelij, or built in terminal tabs)
 - hover (shift K)
 - signature help (\<C-h\>)
+- find and replace (project wide and file wide)
+  - Figure out how to set a keybind for this 
+  - Good example for benefits of nvim
+- cfdo 
+- Undo tree
+ - Be careful because nvim creates backup files even if they are password protected if undo tree is installed 
+- Basically any feature you want, you can add
+- Macros
+- Cool keybinds
+  - Cltr i and o
+  - Make your own keybinds
+    - Showcase yank to system clipboard
 
 ### VSCode
 
