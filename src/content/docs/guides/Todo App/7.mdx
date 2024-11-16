@@ -1,0 +1,22 @@
+---
+title: "Persistence with a Database"
+---
+
+Every time we restart the app, all the todos get deleted because they are stored in memory.
+What's the point of a todo app if it can't remember things?
+
+That's where a database comes into play.
+
+We will be using sqlite3 for this guide, but you could use postgres or mysql just as easily (apart from the initial setup).
+
+
+
+- basic example of get and create with database/sql
+  - works, but its pretty verbose and boring to write
+  - fix with codegen
+  - why not just codegen the whole api?
+    - firebase, and why it's bad (security vuln)
+- switch to sqlc
+  - set up schema.sql
+    - sqlite3 db.db < schema.sql
+  - set up query.sql
