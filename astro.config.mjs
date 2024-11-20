@@ -2,10 +2,13 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+import react from "@astrojs/react";
+import tailwind from "@astrojs/tailwind";
 // import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
 
 // https://astro.build/config
 export default defineConfig({
+  publicDir: "./public",
   markdown: {
     remarkPlugins: [remarkMath],
     rehypePlugins: [rehypeKatex],
@@ -59,5 +62,8 @@ export default defineConfig({
         // plugins: [pluginShiki()],
       },
     }),
+    react(),
+    tailwind(),
   ],
 });
+

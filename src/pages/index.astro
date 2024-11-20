@@ -1,0 +1,28 @@
+---
+import HackathonCard from "../components/hackathon-card.tsx";
+---
+
+<html class="h-full">
+    <body class="h-full">
+        <div class="grid grid-cols-1 lg:grid-cols-3 w-full h-full">
+            <div class="col-span-1">
+                <h1 class="title">Welcome to Brandeis HACK</h1>
+                <p>HACK things together, then HACK them apart.</p>
+                <a href="/fundamentals/0_bash/"
+                    >Get started with the fundamentals</a
+                >
+                <a href="https://discord.gg/32c7VFWCP6">Discord</a>
+                <a href="https://github.com/0xdeis">GitHub</a>
+            </div>
+            <div class="col-span-1 lg:col-span-2">
+                <HackathonCard client:only="react" />
+            </div>
+        </div>
+    </body>
+</html>
+
+<style>
+    .title {
+        font-size: clamp(1.8125rem, calc(0.25rem + 5vw), 4rem);
+    }
+</style>

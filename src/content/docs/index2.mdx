@@ -1,5 +1,5 @@
 ---
-title: Welcome to the Brandeis HACK Club
+title: Welcome to Brandeis HACK
 description: HACK things together, then HACK them apart.
 template: splash
 hero:
@@ -18,6 +18,9 @@ hero:
 
 import { Card, CardGrid } from "@astrojs/starlight/components";
 import {} from "../../components/posthog.astro";
+import Counter from "../../components/counter.tsx"
+
+<Counter client:load />
 
 > Programmers and hackers use the same knowledge, they just think differently.
 >
@@ -32,6 +35,7 @@ you can begin to find bugs. Maybe even make a few websites to really see how
 everything fits together, and then try to break things.
 
 ## Next steps
+
 
 <CardGrid stagger>
   <Card title="Update content" icon="pencil">
